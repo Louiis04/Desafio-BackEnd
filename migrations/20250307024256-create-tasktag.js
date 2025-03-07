@@ -1,35 +1,28 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Tasks', {
+    await queryInterface.createTable('TaskTag', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      title: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      status: {
-        type: Sequelize.ENUM('Em andamento', 'Finalizado'),
-        allowNull: false
-      },
-      priority: {
+      TaskId: {
         type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      description: {
-        type: Sequelize.TEXT
-      },
-      userId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
-          model: 'Users',
+          model: 'Tasks',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE'
+      },
+      TagId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Tags',
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
       },
       createdAt: {
         allowNull: false,
@@ -42,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Tasks');
+    await queryInterface.dropTable('TaskTag');
   }
 };

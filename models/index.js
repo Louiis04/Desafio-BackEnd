@@ -13,9 +13,11 @@ const User = UserModel(sequelize);
 const Task = TaskModel(sequelize);
 const Tag = TagModel(sequelize);
 
-// Definindo relacionamentos
 Task.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Task, { foreignKey: 'userId' });
+
+Tag.belongsTo(User, { foreignKey: 'userId' }); 
+User.hasMany(Tag, { foreignKey: 'userId' }); 
 
 Task.belongsToMany(Tag, { through: 'TaskTag', as: 'tags' });
 Tag.belongsToMany(Task, { through: 'TaskTag', as: 'tasks' });

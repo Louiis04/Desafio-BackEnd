@@ -70,7 +70,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Adicionar tag à task
 router.post('/:id/tags', async (req, res) => {
   try {
     const task = await Task.findOne({
@@ -84,9 +83,15 @@ router.post('/:id/tags', async (req, res) => {
       return res.status(404).json({ error: 'Tarefa não encontrada ou sem permissão' });
     }
 
-    const tag = await Tag.findByPk(req.body.tagId);
+    const tag = await Tag.findOne({
+      where: {
+        id: req.body.tagId,
+        userId: req.userId
+      }
+    });
+    
     if (!tag) {
-      return res.status(404).json({ error: 'Tag não encontrada' });
+      return res.status(404).json({ error: 'Tag não encontrada ou sem permissão' });
     }
 
     await task.addTag(tag);
