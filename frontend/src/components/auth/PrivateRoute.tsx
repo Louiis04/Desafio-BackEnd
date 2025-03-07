@@ -16,7 +16,6 @@ export const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   if (!isAuthenticated) {
-    // Salva a localização atual para redirecionar depois do login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

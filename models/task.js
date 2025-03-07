@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
-module.exports = (sequelize) =>
-  sequelize.define('Task', {
+module.exports = (sequelize) => {
+  const Task = sequelize.define('Task', {
     title: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -20,4 +20,20 @@ module.exports = (sequelize) =>
     description: {
       type: DataTypes.TEXT,
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'id'
+      }
+    }
   });
+
+  Task.associate = (models) => {
+    Task.belongsTo(models.User, { foreignKey: 'userId' });
+    Task.belongsToMany(models.Tag, { through: 'TaskTag', as: 'tags' });
+  };
+
+  return Task;
+};

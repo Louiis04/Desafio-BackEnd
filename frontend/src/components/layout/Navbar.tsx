@@ -30,7 +30,7 @@ export const Navbar: React.FC = () => {
               Tasks
             </Button>
             <Button color="inherit" onClick={() => navigate('/tags')}>
-              Manage Tags
+              Tags
             </Button>
             <Button color="inherit" onClick={handleLogout}>
               Logout

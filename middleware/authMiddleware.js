@@ -7,7 +7,6 @@ const authMiddleware = (req, res, next) => {
     return res.status(403).json({ error: 'Token não fornecido' });
   }
 
-  // Extrair o token do header 'Bearer <token>'
   const token = authHeader.split(' ')[1];
   
   if (!token) {

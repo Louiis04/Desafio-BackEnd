@@ -27,9 +27,12 @@ router.post('/login', async (req, res) => {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) return res.status(401).json({ error: 'Senha incorreta' });
 
-    const token = jwt.sign({ id: user.id }, 'seu-segredo-aqui', { expiresIn: '1h' });
-    
-    // Retornar mais informações do usuário junto com o token
+    const token = jwt.sign(
+      { id: user.id }, 
+      'seu-segredo-aqui',
+      { expiresIn: '1h' }
+    );
+
     res.json({
       token,
       user: {

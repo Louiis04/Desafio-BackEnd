@@ -16,9 +16,8 @@ export const LoginForm: React.FC = () => {
       e.preventDefault();
       try {
         const response = await authService.login(email, password);
-        console.log('Login response:', response); // Para debug
+        console.log('Login response:', response); 
         
-        // Agora passamos tanto o token quanto os dados do usuário
         await login(response.token, response.user);
         
         showNotification('Login successful!', 'success');

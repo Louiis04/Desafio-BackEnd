@@ -4,7 +4,6 @@ const api = axios.create({
   baseURL: 'http://localhost:3000',
 });
 
-// Atualizado para incluir 'Bearer' no token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -13,7 +12,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Melhor tratamento de erros
 api.interceptors.response.use(
   (response) => response,
   (error) => {

@@ -33,7 +33,7 @@ export const TasksPage: React.FC = () => {
   const loadTags = async () => {
     try {
       const data = await tagService.getTags();
-      console.log('Loaded tags:', data); // Debug log
+      console.log('Loaded tags:', data); 
       setTags(data);
     } catch (error) {
       console.error('Failed to load tags:', error);
@@ -43,7 +43,7 @@ export const TasksPage: React.FC = () => {
 
   const handleCreateTask = async (taskData: Partial<Task>) => {
     try {
-      console.log('Creating task with data:', taskData); // Debug log
+      console.log('Creating task with data:', taskData);
       await taskService.createTask(taskData);
       showNotification('Task created successfully', 'success');
       loadTasks();
@@ -53,7 +53,6 @@ export const TasksPage: React.FC = () => {
         ? error.message 
         : 'Unknown error';
 
-      // Safe type checking for axios error structure
       const axiosError = error as { response?: { data?: any } };
       console.error('Failed to create task:', axiosError.response?.data || errorMessage); // Log detalhado do erro
       
@@ -116,7 +115,7 @@ export const TasksPage: React.FC = () => {
           }}
           onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
           initialData={editingTask}
-          tags={tags} // Passando as tags carregadas para o TaskForm
+          tags={tags} 
         />
       </Box>
     </Container>
