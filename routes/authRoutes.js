@@ -20,14 +20,28 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ where: { email } });
-  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 
-  const isValid = await bcrypt.compare(password, user.password);
-  if (!isValid) return res.status(401).json({ error: 'Senha incorreta' });
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) return res.status(401).json({ error: 'Senha incorreta' });
 
-  const token = jwt.sign({ id: user.id }, 'seu-segredo-aqui', { expiresIn: '1h' });
-  res.json({ token });
+    const token = jwt.sign({ id: user.id }, 'seu-segredo-aqui', { expiresIn: '1h' });
+    
+    // Retornar mais informações do usuário junto com o token
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error('Erro no login:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
 });
 
 module.exports = router;

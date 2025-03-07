@@ -7,17 +7,20 @@ const authRoutes = require('./routes/authRoutes');
 require('dotenv').config();
 
 const app = express();
-app.use('/auth', authRoutes);
+
+// Middlewares devem vir antes das rotas
 app.use(cors());
 app.use(express.json());
 
+// Rotas
 app.get('/', (req, res) => {
   res.send('API funcionando!');
 });
 
+// Define as rotas uma única vez
+app.use('/auth', authRoutes);
 app.use('/tasks', taskRoutes);
 app.use('/tags', tagRoutes);
-app.use('/auth', authRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
