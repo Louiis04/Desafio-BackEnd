@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Container, Box, Button, Typography, CircularProgress, Stack } from '@mui/material';
+import { Box, Button, Typography, CircularProgress, Stack } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { TaskList } from '../components/tasks/TaskList';
 import { TaskForm } from '../components/tasks/TaskForm';
@@ -129,51 +129,51 @@ export const TasksPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ my: 4 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h4">My Tasks</Typography>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => setIsFormOpen(true)}
-            disabled={loading}
-          >
-            Add Task
-          </Button>
-        </Stack>
+    <Box sx={{ my: 0 }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4">My Tasks</Typography>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => setIsFormOpen(true)}
+          disabled={loading}
+        >
+          Add Task
+        </Button>
+      </Stack>
 
-        <TaskFilters
-          search={search}
-          setSearch={setSearch}
-          selectedPriority={selectedPriority}
-          setSelectedPriority={setSelectedPriority}
-          selectedTags={selectedTags}
-          setSelectedTags={setSelectedTags}
-          availableTags={tags}
+      <TaskFilters
+        search={search}
+        setSearch={setSearch}
+        selectedPriority={selectedPriority}
+        setSelectedPriority={setSelectedPriority}
+        selectedTags={selectedTags}
+        setSelectedTags={setSelectedTags}
+        availableTags={tags}
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+      />
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <TaskList
+          tasks={filteredTasks}
+          onDelete={handleDeleteTask}
+          onEdit={handleEdit}
         />
+      )}
 
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <TaskList
-            tasks={filteredTasks}
-            onDelete={handleDeleteTask}
-            onEdit={handleEdit}
-          />
-        )}
-
-        <TaskForm
-          open={isFormOpen}
-          onClose={handleCloseForm}
-          onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
-          initialData={editingTask}
-          tags={tags}
-          isSubmitting={formSubmitting}
-        />
-      </Box>
-    </Container>
+      <TaskForm
+        open={isFormOpen}
+        onClose={handleCloseForm}
+        onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
+        initialData={editingTask}
+        tags={tags}
+        isSubmitting={formSubmitting}
+      />
+    </Box>
   );
 };

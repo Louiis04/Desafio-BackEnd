@@ -5,13 +5,19 @@ import {
   Typography,
   Button,
   Box,
+  IconButton,
 } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import MenuIcon from '@mui/icons-material/Menu';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../Context/AuthContext';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  handleDrawerToggle: () => void;
+  drawerWidth: number;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ handleDrawerToggle, drawerWidth }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { logout, isAuthenticated } = useAuth();
 
   const handleLogout = () => {
@@ -19,50 +25,37 @@ export const Navbar: React.FC = () => {
     navigate('/login');
   };
 
-  const isActive = (path: string) => location.pathname === path;
-
   return (
-    <AppBar position="static">
+    <AppBar
+      position="fixed"
+      sx={{
+        width: { sm: `calc(100% - ${drawerWidth}px)` },
+        ml: { sm: `${drawerWidth}px` },
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
+    >
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Todo App
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          edge="start"
+          onClick={handleDrawerToggle}
+          sx={{ mr: 2, display: { sm: 'none' } }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
         </Typography>
         {isAuthenticated ? (
           <Box>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/tasks')}
-              sx={{ fontWeight: isActive('/tasks') ? 'bold' : 'normal' }}
-            >
-              Tasks
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/tags')}
-              sx={{ fontWeight: isActive('/tags') ? 'bold' : 'normal' }}
-            >
-              Tags
-            </Button>
             <Button color="inherit" onClick={handleLogout}>
               Logout
             </Button>
           </Box>
         ) : (
           <Box>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/login')}
-              sx={{ fontWeight: isActive('/login') ? 'bold' : 'normal' }}
-            >
-              Login
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/register')}
-              sx={{ fontWeight: isActive('/register') ? 'bold' : 'normal' }}
-            >
-              Register
-            </Button>
+            <Button color="inherit" onClick={() => navigate('/login')}>Login</Button>
+            <Button color="inherit" onClick={() => navigate('/register')}>Register</Button>
           </Box>
         )}
       </Toolbar>

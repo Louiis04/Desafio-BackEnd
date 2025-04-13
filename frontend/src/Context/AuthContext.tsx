@@ -1,75 +1,64 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '../types';
-import { useNotification } from './NotificationContext';
-import api from '../services/api';
 
 interface AuthContextData {
-  user: User | null;
-  loading: boolean;
-  login: (token: string, userData: User) => Promise<void>;
-  logout: () => void;
   isAuthenticated: boolean;
+  user: User | null;
+  token: string | null;
+  login: (token: string, user: User) => Promise<void>;
+  logout: () => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { showNotification } = useNotification();
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      const token = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
-      
-      if (token && storedUser) {
-        try {
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          setUser(JSON.parse(storedUser));
-        } catch (error) {
-          console.error('Error initializing auth:', error);
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        }
-      }
-      setLoading(false);
-    };
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
 
-    initializeAuth();
+    if (storedToken && storedUser) {
+      try {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to parse stored user data:", error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    }
+    setLoading(false);
   }, []);
 
-  const login = async (token: string, userData: User) => {
-    try {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-    } catch (error) {
-      console.error('Error in login:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      api.defaults.headers.common['Authorization'] = '';
-      throw error;
-    }
+  const login = async (newToken: string, userData: User) => {
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setToken(newToken);
+    setUser(userData);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    api.defaults.headers.common['Authorization'] = '';
+    setToken(null);
     setUser(null);
-    showNotification('Logged out successfully', 'success');
   };
 
   return (
     <AuthContext.Provider
       value={{
+        isAuthenticated: !!token && !!user,
         user,
-        loading,
+        token,
         login,
         logout,
-        isAuthenticated: !!user,
+        setUser,
+        loading,
       }}
     >
       {children}
@@ -77,4 +66,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

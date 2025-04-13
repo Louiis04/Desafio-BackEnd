@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
   Box,
   Button,
   Typography,
@@ -10,9 +9,10 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-  Paper, } from '@mui/material';
+  Paper,
+} from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
-import { TagManagerDialog } from '../components/tags/TagManagerDialog'; 
+import { TagManagerDialog } from '../components/tags/TagManagerDialog';
 import { tagService } from '../services/tagService';
 import { Tag } from '../types';
 import { useNotification } from '../Context/NotificationContext';
@@ -47,7 +47,7 @@ export const TagsPage: React.FC = () => {
   };
 
   const handleCloseDialog = () => {
-    if (dialogSubmitting) return; // Prevent closing while submitting
+    if (dialogSubmitting) return;
     setIsDialogOpen(false);
     setEditingTag(null);
   };
@@ -63,7 +63,7 @@ export const TagsPage: React.FC = () => {
         showNotification('Tag created successfully', 'success');
       }
       loadTags();
-      handleCloseDialog(); // Close dialog on success
+      handleCloseDialog();
     } catch (error) {
       showNotification(
         `Failed to ${editingTag ? 'update' : 'create'} tag`,
@@ -75,7 +75,6 @@ export const TagsPage: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    // Consider adding a confirmation dialog here
     try {
       await tagService.deleteTag(id);
       showNotification('Tag deleted successfully', 'success');
@@ -88,69 +87,66 @@ export const TagsPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md"> {/* Use Container */}
-      <Box sx={{ my: 4 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h4">Manage Tags</Typography>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => handleOpenDialog()}
-            disabled={loading}
-          >
-            New Tag
-          </Button>
-        </Stack>
+    <Box sx={{ my: 0 }}> 
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4">Manage Tags</Typography>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => handleOpenDialog()}
+          disabled={loading}
+        >
+          New Tag
+        </Button>
+      </Stack>
 
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Paper elevation={2}> {/* Wrap List in Paper */}
-            <List>
-              {tags.length === 0 && !loading ? (
-                 <ListItem>
-                    <ListItemText primary="No tags found." sx={{textAlign: 'center'}}/>
-                 </ListItem>
-              ) : (
-                tags.map((tag) => (
-                  <ListItem
-                    key={tag.id}
-                    secondaryAction={
-                      <Stack direction="row" spacing={1}> {/* Use Stack for actions */}
-                        <IconButton edge="end" aria-label="edit" onClick={() => handleOpenDialog(tag)}>
-                          <Edit />
-                        </IconButton>
-                        <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(tag.id)}>
-                          <Delete />
-                        </IconButton>
-                      </Stack>
-                    }
-                    sx={{ '&:not(:last-child)': { borderBottom: '1px solid #eee' } }} // Add divider
-                  >
-                    <Box
-                      component="span"
-                      sx={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: '50%',
-                        backgroundColor: tag.color,
-                        mr: 2, // Add margin right
-                        display: 'inline-block',
-                        verticalAlign: 'middle', // Align color dot vertically
-                      }}
-                    />
-                    <ListItemText primary={tag.name} />
-                  </ListItem>
-                ))
-              )}
-            </List>
-          </Paper>
-        )}
-      </Box>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Paper elevation={2}>
+          <List>
+            {tags.length === 0 && !loading ? (
+               <ListItem>
+                  <ListItemText primary="No tags found." sx={{textAlign: 'center'}}/>
+               </ListItem>
+            ) : (
+              tags.map((tag) => (
+                <ListItem
+                  key={tag.id}
+                  secondaryAction={
+                    <Stack direction="row" spacing={1}>
+                      <IconButton edge="end" aria-label="edit" onClick={() => handleOpenDialog(tag)}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(tag.id)}>
+                        <Delete />
+                      </IconButton>
+                    </Stack>
+                  }
+                  sx={{ '&:not(:last-child)': { borderBottom: '1px solid #eee' } }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      backgroundColor: tag.color,
+                      mr: 2,
+                      display: 'inline-block',
+                      verticalAlign: 'middle',
+                    }}
+                  />
+                  <ListItemText primary={tag.name} />
+                </ListItem>
+              ))
+            )}
+          </List>
+        </Paper>
+      )}
 
-      {/* Use the separate Dialog component */}
       <TagManagerDialog
         open={isDialogOpen}
         onClose={handleCloseDialog}
@@ -158,6 +154,6 @@ export const TagsPage: React.FC = () => {
         initialData={editingTag}
         isSubmitting={dialogSubmitting}
       />
-    </Container>
+    </Box>
   );
 };

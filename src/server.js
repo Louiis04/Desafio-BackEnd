@@ -1,20 +1,23 @@
 const express = require('express');
 const cors = require('cors');
-const { sequelize } = require('./models'); 
+const { sequelize } = require('./models');
 const taskRoutes = require('./routes/taskRoutes');
 const tagRoutes = require('./routes/tagRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3001', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'] 
+}));
+
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('API funcionando!');
-});
-
+app.use(userRoutes);
 app.use('/auth', authRoutes);
 app.use('/tasks', taskRoutes);
 app.use('/tags', tagRoutes);
@@ -27,7 +30,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 sequelize
-  .sync({ alter: true })
+  .sync({ alter: true }) 
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);
