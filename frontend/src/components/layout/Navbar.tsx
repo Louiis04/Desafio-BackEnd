@@ -6,17 +6,20 @@ import {
   Button,
   Box,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../Context/AuthContext';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout, isAuthenticated } = useAuth();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <AppBar position="static">
@@ -26,10 +29,18 @@ export const Navbar: React.FC = () => {
         </Typography>
         {isAuthenticated ? (
           <Box>
-            <Button color="inherit" onClick={() => navigate('/tasks')}>
+            <Button
+              color="inherit"
+              onClick={() => navigate('/tasks')}
+              sx={{ fontWeight: isActive('/tasks') ? 'bold' : 'normal' }}
+            >
               Tasks
             </Button>
-            <Button color="inherit" onClick={() => navigate('/tags')}>
+            <Button
+              color="inherit"
+              onClick={() => navigate('/tags')}
+              sx={{ fontWeight: isActive('/tags') ? 'bold' : 'normal' }}
+            >
               Tags
             </Button>
             <Button color="inherit" onClick={handleLogout}>
@@ -38,10 +49,18 @@ export const Navbar: React.FC = () => {
           </Box>
         ) : (
           <Box>
-            <Button color="inherit" onClick={() => navigate('/login')}>
+            <Button
+              color="inherit"
+              onClick={() => navigate('/login')}
+              sx={{ fontWeight: isActive('/login') ? 'bold' : 'normal' }}
+            >
               Login
             </Button>
-            <Button color="inherit" onClick={() => navigate('/register')}>
+            <Button
+              color="inherit"
+              onClick={() => navigate('/register')}
+              sx={{ fontWeight: isActive('/register') ? 'bold' : 'normal' }}
+            >
               Register
             </Button>
           </Box>

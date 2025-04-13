@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
 import { TasksPage } from '../pages/TasksPage';
-import { TagManager } from '../components/tags/TagManager';
+import { TagsPage } from '../pages/TagsPage';
 import { PrivateRoute } from '../components/auth/PrivateRoute';
 
 export const AppRoutes: React.FC = () => {
@@ -23,7 +23,7 @@ export const AppRoutes: React.FC = () => {
         path="/tags"
         element={
           <PrivateRoute>
-            <TagManager />
+            <TagsPage />
           </PrivateRoute>
         }
       />

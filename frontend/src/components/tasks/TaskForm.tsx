@@ -12,6 +12,7 @@ import {
   InputLabel,
   Box,
   Chip,
+  CircularProgress,
 } from '@mui/material';
 import { Task, Priority, Tag, TaskStatus } from '../../types';
 
@@ -21,40 +22,44 @@ interface TaskFormProps {
   onSubmit: (task: Partial<Task>) => void;
   initialData?: Task;
   tags: Tag[];
+  isSubmitting?: boolean;
 }
 
 export const TaskForm: React.FC<TaskFormProps> = ({
-    open,
-    onClose,
-    onSubmit,
-    initialData,
-    tags,
-  }) => {
-    const [title, setTitle] = useState(initialData?.title || '');
-    const [description, setDescription] = useState(initialData?.description || '');
-    const [priority, setPriority] = useState<Priority>(initialData?.priority || 'none');
-    const [status, setStatus] = useState<TaskStatus>(initialData?.status || 'Em andamento');
-    const [selectedTags, setSelectedTags] = useState<string[]>(
-      initialData?.tags?.map((tag) => tag.id) || []
-    );
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+  tags,
+  isSubmitting = false,
+}) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState<Priority>('none');
+  const [status, setStatus] = useState<TaskStatus>('Em andamento');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  // Reset form when initialData changes
   useEffect(() => {
-    if (initialData) {
-      setTitle(initialData.title);
-      setDescription(initialData.description);
-      setPriority(initialData.priority);
-      setSelectedTags(initialData.tags?.map((tag) => tag.id) || []);
-    } else {
-      setTitle('');
-      setDescription('');
-      setPriority('none');
-      setSelectedTags([]);
+    if (open) {
+      if (initialData) {
+        setTitle(initialData.title || '');
+        setDescription(initialData.description || '');
+        setPriority(initialData.priority || 'none');
+        setStatus(initialData.status || 'Em andamento');
+        setSelectedTags(initialData.tags?.map((tag) => tag.id) || []);
+      } else {
+        setTitle('');
+        setDescription('');
+        setPriority('none');
+        setStatus('Em andamento');
+        setSelectedTags([]);
+      }
     }
-  }, [initialData]);
+  }, [initialData, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     onSubmit({
       title,
       description,
@@ -64,13 +69,19 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     });
   };
 
+  const handleClose = () => {
+    if (!isSubmitting) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         {initialData ? 'Edit Task' : 'Create New Task'}
       </DialogTitle>
-      <DialogContent>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+      <form onSubmit={handleSubmit}>
+        <DialogContent>
           <TextField
             fullWidth
             label="Title"
@@ -78,6 +89,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             onChange={(e) => setTitle(e.target.value)}
             margin="normal"
             required
+            disabled={isSubmitting}
           />
 
           <TextField
@@ -88,9 +100,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             margin="normal"
             multiline
             rows={4}
+            disabled={isSubmitting}
           />
 
-          <FormControl fullWidth margin="normal">
+          <FormControl fullWidth margin="normal" disabled={isSubmitting}>
             <InputLabel>Status</InputLabel>
             <Select
               value={status}
@@ -102,7 +115,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             </Select>
           </FormControl>
 
-          <FormControl fullWidth margin="normal">
+          <FormControl fullWidth margin="normal" disabled={isSubmitting}>
             <InputLabel>Priority</InputLabel>
             <Select
               value={priority}
@@ -116,14 +129,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             </Select>
           </FormControl>
 
-          <FormControl fullWidth margin="normal">
+          <FormControl fullWidth margin="normal" disabled={isSubmitting}>
             <InputLabel>Tags</InputLabel>
             <Select
               multiple
               value={selectedTags}
               onChange={(e) => {
                 const value = e.target.value;
-                setSelectedTags(typeof value === 'string' ? [] : value);
+                setSelectedTags(typeof value === 'string' ? value.split(',') : value);
               }}
               label="Tags"
               renderValue={(selected) => (
@@ -134,6 +147,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                       <Chip
                         key={tag.id}
                         label={tag.name}
+                        size="small"
                         sx={{
                           backgroundColor: tag.color,
                           color: '#fff',
@@ -148,11 +162,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 <MenuItem key={tag.id} value={tag.id}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Box
+                      component="span"
                       sx={{
-                        width: 20,
-                        height: 20,
+                        width: 16,
+                        height: 16,
                         borderRadius: '50%',
                         backgroundColor: tag.color,
+                        display: 'inline-block',
+                        mr: 1,
                       }}
                     />
                     {tag.name}
@@ -161,14 +178,19 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               ))}
             </Select>
           </FormControl>
-        </Box>
         </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained">
-          {initialData ? 'Save' : 'Create'}
-        </Button>
-      </DialogActions>
+        <DialogActions>
+          <Button onClick={handleClose} disabled={isSubmitting}>Cancel</Button>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
+          >
+            {isSubmitting ? (initialData ? 'Saving...' : 'Creating...') : (initialData ? 'Save' : 'Create')}
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };
